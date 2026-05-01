@@ -669,11 +669,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("D:/multi_device2/build/esp-idf/DFRobotDFPlayerMini/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("D:/multi_device2/build/esp-idf/esp_idf_lib_helpers/cmake_install.cmake")
 endif()
 
@@ -685,10 +680,5 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
   include("D:/multi_device2/build/esp-idf/ds18x20/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("D:/multi_device2/build/esp-idf/DFPlay/cmake_install.cmake")
 endif()
 

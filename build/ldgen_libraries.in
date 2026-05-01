@@ -104,7 +104,5 @@ $<TARGET_FILE:__idf_espressif__button>
 $<TARGET_FILE:__idf_rmaker_app_reset>
 $<TARGET_FILE:__idf_espressif__ssd1306>
 $<TARGET_FILE:__idf_main>
-$<TARGET_FILE:__idf_DFRobotDFPlayerMini>
 $<TARGET_FILE:__idf_onewire>
 $<TARGET_FILE:__idf_ds18x20>
-$<TARGET_FILE:__idf_DFPlay>

@@ -104,7 +104,5 @@ D:/multi_device2/build/esp-idf/espressif__button/libespressif__button.a
 D:/multi_device2/build/esp-idf/rmaker_app_reset/librmaker_app_reset.a
 D:/multi_device2/build/esp-idf/espressif__ssd1306/libespressif__ssd1306.a
 D:/multi_device2/build/esp-idf/main/libmain.a
-D:/multi_device2/build/esp-idf/DFRobotDFPlayerMini/libDFRobotDFPlayerMini.a
 D:/multi_device2/build/esp-idf/onewire/libonewire.a
 D:/multi_device2/build/esp-idf/ds18x20/libds18x20.a
-D:/multi_device2/build/esp-idf/DFPlay/libDFPlay.a

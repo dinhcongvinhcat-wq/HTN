@@ -998,13 +998,6 @@ D:/multi_device2/build/esp-idf/main/CMakeFiles/list_install_components.dir
 D:/multi_device2/build/esp-idf/main/CMakeFiles/install.dir
 D:/multi_device2/build/esp-idf/main/CMakeFiles/install/local.dir
 D:/multi_device2/build/esp-idf/main/CMakeFiles/install/strip.dir
-D:/multi_device2/build/esp-idf/DFRobotDFPlayerMini/CMakeFiles/__idf_DFRobotDFPlayerMini.dir
-D:/multi_device2/build/esp-idf/DFRobotDFPlayerMini/CMakeFiles/edit_cache.dir
-D:/multi_device2/build/esp-idf/DFRobotDFPlayerMini/CMakeFiles/rebuild_cache.dir
-D:/multi_device2/build/esp-idf/DFRobotDFPlayerMini/CMakeFiles/list_install_components.dir
-D:/multi_device2/build/esp-idf/DFRobotDFPlayerMini/CMakeFiles/install.dir
-D:/multi_device2/build/esp-idf/DFRobotDFPlayerMini/CMakeFiles/install/local.dir
-D:/multi_device2/build/esp-idf/DFRobotDFPlayerMini/CMakeFiles/install/strip.dir
 D:/multi_device2/build/esp-idf/esp_idf_lib_helpers/CMakeFiles/edit_cache.dir
 D:/multi_device2/build/esp-idf/esp_idf_lib_helpers/CMakeFiles/rebuild_cache.dir
 D:/multi_device2/build/esp-idf/esp_idf_lib_helpers/CMakeFiles/list_install_components.dir
@@ -1025,10 +1018,3 @@ D:/multi_device2/build/esp-idf/ds18x20/CMakeFiles/list_install_components.dir
 D:/multi_device2/build/esp-idf/ds18x20/CMakeFiles/install.dir
 D:/multi_device2/build/esp-idf/ds18x20/CMakeFiles/install/local.dir
 D:/multi_device2/build/esp-idf/ds18x20/CMakeFiles/install/strip.dir
-D:/multi_device2/build/esp-idf/DFPlay/CMakeFiles/__idf_DFPlay.dir
-D:/multi_device2/build/esp-idf/DFPlay/CMakeFiles/edit_cache.dir
-D:/multi_device2/build/esp-idf/DFPlay/CMakeFiles/rebuild_cache.dir
-D:/multi_device2/build/esp-idf/DFPlay/CMakeFiles/list_install_components.dir
-D:/multi_device2/build/esp-idf/DFPlay/CMakeFiles/install.dir
-D:/multi_device2/build/esp-idf/DFPlay/CMakeFiles/install/local.dir
-D:/multi_device2/build/esp-idf/DFPlay/CMakeFiles/install/strip.dir

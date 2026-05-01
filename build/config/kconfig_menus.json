@@ -5016,60 +5016,6 @@
     {
         "children": [
             {
-                "children": [],
-                "depends_on": null,
-                "help": null,
-                "id": "GPIO_RANGE_MAX",
-                "name": "GPIO_RANGE_MAX",
-                "range": null,
-                "title": null,
-                "type": "int"
-            },
-            {
-                "children": [],
-                "depends_on": null,
-                "help": "GPIO number (IOxx) to CTX.\nSome GPIOs are used for other purposes (flash connections, etc.).\nGPIOs 35-39 are input-only so cannot be used as outputs.",
-                "id": "TX_GPIO",
-                "name": "TX_GPIO",
-                "range": [
-                    0,
-                    33
-                ],
-                "title": "TX GPIO number",
-                "type": "int"
-            },
-            {
-                "children": [],
-                "depends_on": null,
-                "help": "GPIO number (IOxx) to CRX.\nSome GPIOs are used for other purposes (flash connections, etc.).\nGPIOs 35-39 are input-only so cannot be used as outputse",
-                "id": "RX_GPIO",
-                "name": "RX_GPIO",
-                "range": [
-                    0,
-                    33
-                ],
-                "title": "RX GPIO number",
-                "type": "int"
-            },
-            {
-                "children": [],
-                "depends_on": null,
-                "help": "Enable Debug Mode.",
-                "id": "DEBUG_MODE",
-                "name": "DEBUG_MODE",
-                "range": null,
-                "title": "Enable Debug Mode",
-                "type": "bool"
-            }
-        ],
-        "depends_on": null,
-        "id": "dfplayermini-configuration",
-        "title": "DFPlayerMini Configuration",
-        "type": "menu"
-    },
-    {
-        "children": [
-            {
                 "children": [
                     {
                         "children": [],
