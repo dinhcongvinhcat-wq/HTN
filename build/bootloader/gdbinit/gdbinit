@@ -1,0 +1,2 @@
+source D:/multi_device2/build/bootloader/gdbinit/symbols
+source D:/multi_device2/build/bootloader/gdbinit/connect

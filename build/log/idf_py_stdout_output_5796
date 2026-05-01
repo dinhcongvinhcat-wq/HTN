@@ -1,0 +1,308 @@
+0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: �ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6276
+load:0x40078000,len:15816
+load:0x40080400,len:4
+load:0x40080404,len:3860
+entry 0x4008063c
+[0;32mI (29) boot: ESP-IDF v5.4.2-dirty 2nd stage bootloader[0m
+[0;32mI (29) boot: compile time May  1 2026 12:47:22[0m
+[0;32mI (30) boot: Multicore bootloader[0m
+[0;32mI (31) boot: chip revision: v3.1[0m
+[0;32mI (34) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (38) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (41) boot.esp32: SPI Flash Size : 4MB[0m
+[0;32mI (45) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (52) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (58) boot:  0 esp_secure_cert  unknown          3f 06 0000d000 00002000[0m
+[0;32mI (65) boot:  1 nvs_key          NVS keys         01 04 0000f000 00001000[0m
+[0;32mI (71) boot:  2 nvs              WiFi data        01 02 00010000 00006000[0m
+[0;32mI (78) boot:  3 otadata          OTA data         01 00 00016000 00002000[0m
+[0;32mI (84) boot:  4 phy_init         RF data          01 01 00018000 00001000[0m
+[0;32mI (91) boot:  5 ota_0            OTA app          00 10 00020000 001e0000[0m
+[0;32mI (97) boot:  6 ota_1            OTA app          00 11 00200000 001e0000[0m
+[0;32mI (104) boot:  7 reserved         unknown          06 06 003e0000 0001a000[0m
+[0;32mI (111) boot:  8 fctry            WiFi data        01 02 003fa000 00006000[0m
+[0;32mI (117) boot: End of partition table[0m
+[0;32mI (120) boot: No factory image, trying OTA 0[0m
+[0;32mI (124) esp_image: segment 0: paddr=00020020 vaddr=3f400020 size=49970h (301424) map[0m
+[0;32mI (235) esp_image: segment 1: paddr=00069998 vaddr=3ff80000 size=0001ch (    28) load[0m
+[0;32mI (235) esp_image: segment 2: paddr=000699bc vaddr=3ffbdb60 size=05ef0h ( 24304) load[0m
+[0;32mI (248) esp_image: segment 3: paddr=0006f8b4 vaddr=40080000 size=00764h (  1892) load[0m
+[0;32mI (249) esp_image: segment 4: paddr=00070020 vaddr=400d0020 size=105c14h (1072148) map[0m
+[0;32mI (620) esp_image: segment 5: paddr=00175c3c vaddr=40080764 size=1e48ch (124044) load[0m
+[0;32mI (684) boot: Loaded app from partition at offset 0x20000[0m
+[0;32mI (689) boot: Set actual ota_seq=1 in otadata[0][0m
+[0;32mI (689) boot: Disabling RNG early entropy source...[0m
+[0;32mI (701) cpu_start: Multicore app[0m
+[0;32mI (709) cpu_start: Pro cpu start user code[0m
+[0;32mI (709) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (709) app_init: Application information:[0m
+[0;32mI (709) app_init: Project name:     multi_device1[0m
+[0;32mI (714) app_init: App version:      1.0[0m
+[0;32mI (717) app_init: Compile time:     May  1 2026 12:46:38[0m
+[0;32mI (722) app_init: ELF file SHA256:  86fe38d41...[0m
+[0;32mI (727) app_init: ESP-IDF:          v5.4.2-dirty[0m
+[0;32mI (731) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (735) efuse_init: Max chip rev:     v3.99 [0m
+[0;32mI (739) efuse_init: Chip rev:         v3.1[0m
+[0;32mI (743) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (749) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM[0m
+[0;32mI (754) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM[0m
+[0;32mI (759) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM[0m
+[0;32mI (764) heap_init: At 3FFCB2E8 len 00014D18 (83 KiB): DRAM[0m
+[0;32mI (770) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (775) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (781) heap_init: At 4009EBF0 len 00001410 (5 KiB): IRAM[0m
+[0;32mI (788) spi_flash: detected chip: generic[0m
+[0;32mI (789) spi_flash: flash io: dio[0m
+[0;33mW (793) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;33mW (802) ADC: legacy driver is deprecated, please migrate to `esp_adc/adc_oneshot.h`[0m
+[0;32mI (810) coexist: coex firmware version: 7b9a184[0m
+[0;32mI (815) main_task: Started on CPU0[0m
+[0;32mI (825) main_task: Calling app_main()[0m
+[0;33mW (825) app_driver: Brownout detector DA TAT — dam bao phan cung on dinh![0m
+[0;32mI (835) gpio: GPIO[2]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (835) gpio: GPIO[18]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (835) gpio: GPIO[19]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (845) gpio: GPIO[27]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (2855) app_driver: Servo OFF 90 do[0m
+[1;31mE (2855) ds18b20: ds18b20_set_resolution(112): reset bus error[0m
+[1;31mE (2855) app_driver: Set resolution DS18B20 loi: ESP_ERR_NOT_FOUND[0m
+[1;31mE (2855) app_driver: DS18B20 loi, hien thi -99C[0m
+[0;32mI (2865) gpio: GPIO[13]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (2865) app_driver: XKC-Y26-V NPN | GPIO13 PULL_UP | LOW=day, HIGH=thap[0m
+[0;32mI (2875) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (2925) wifi:wifi driver task: 3ffd0fc4, prio:23, stack:6656, core=0[0m
+[0;32mI (2935) wifi:wifi firmware version: bea31f3[0m
+[0;32mI (2935) wifi:wifi certification version: v7.0[0m
+[0;32mI (2935) wifi:config NVS flash: enabled[0m
+[0;32mI (2935) wifi:config nano formatting: disabled[0m
+[0;32mI (2945) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (2945) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (2955) wifi:Init management short buffer num: 32[0m
+[0;32mI (2955) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (2955) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (2965) wifi:Init static rx buffer num: 10[0m
+[0;32mI (2965) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (2975) wifi_init: rx ba win: 6[0m
+[0;32mI (2975) wifi_init: accept mbox: 6[0m
+[0;32mI (2975) wifi_init: tcpip mbox: 32[0m
+[0;32mI (2985) wifi_init: udp mbox: 6[0m
+[0;32mI (2985) wifi_init: tcp mbox: 6[0m
+[0;32mI (2985) wifi_init: tcp tx win: 5760[0m
+[0;32mI (2985) wifi_init: tcp rx win: 5760[0m
+[0;32mI (2995) wifi_init: tcp mss: 1440[0m
+[0;32mI (2995) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (2995) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (3015) esp_rmaker_work_queue: Work Queue created.[0m
+[0;32mI (3035) esp_mqtt_glue: AWS PPI: ?Platform=APN3|A0|RM|EX00|RMDev|1x0|048308580A50[0m
+[0;32mI (3035) esp_mqtt_glue: Initialising MQTT[0m
+[0;32mI (3035) esp_mqtt_glue: MQTT LWT not configured[0m
+[0;32mI (3035) esp_rmaker_mqtt_budget: MQTT Budgeting initialised. Default: 100, Max: 1024, Revive count: 1, Revive period: 5[0m
+[0;32mI (3045) esp_rmaker_node: Node ID ----- Toc4ZY3pkBJHZimJQwYBR6[0m
+[0;32mI (3055) esp_rmaker_time: Initializing SNTP. Using the SNTP server: pool.ntp.org[0m
+[0;32mI (3065) esp_rmaker_ota_using_topics: OTA enabled with Topics[0m
+[0;32mI (3065) esp_rmaker_ota: OTA state = 2[0m
+[0;32mI (3065) esp_rmaker_time: SNTP already initialized.[0m
+[0;32mI (3075) esp_rmaker_time: SNTP already initialized.[0m
+[0;32mI (3075) esp_rmaker_core: Starting RainMaker Work Queue task[0m
+[0;32mI (3085) esp_rmaker_work_queue: RainMaker Work Queue task started.[0m
+[0;32mI (3095) network_prov_scheme_ble: BT memory released[0m
+[0;32mI (3095) app_wifi: Already provisioned, starting Wi-Fi STA[0m
+[0;32mI (3095) network_prov_scheme_ble: BTDM memory released[0m
+[0;32mI (3105) esp_rmaker_local: Event 7[0m
+[0;32mI (3105) phy_init: phy_version 4860,6b7a6e5,Feb  6 2025,14:47:07[0m
+[0;32mI (3195) phy_init: Saving new calibration data due to checksum failure or outdated calibration data, mode(0)[0m
+[0;32mI (3235) wifi:mode : sta (04:83:08:58:0a:50)[0m
+[0;32mI (3235) wifi:enable tsf[0m
+[0;32mI (5655) wifi:new:<3,0>, old:<1,0>, ap:<255,255>, sta:<3,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (5655) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (5695) wifi:state: auth -> assoc (0x0)[0m
+[0;32mI (5705) wifi:state: assoc -> run (0x10)[0m
+[0;32mI (5825) wifi:connected with Dac Cong Sinh 5G, aid = 4, channel 3, BW20, bssid = b8:29:03:b4:d2:b8[0m
+[0;32mI (5825) wifi:security: WPA2-PSK, phy: bgn, rssi: -24[0m
+[0;32mI (5825) wifi:pm start, type: 1[0m
+
+[0;32mI (5825) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us[0m
+[0;32mI (5855) wifi:AP's beacon interval = 102400 us, DTIM period = 1[0m
+[0;32mI (5895) wifi:<ba-add>idx:0 (ifx:0, b8:29:03:b4:d2:b8), tid:0, ssn:3, winSize:64[0m
+[0;32mI (6945) esp_netif_handlers: sta ip: 192.168.1.26, mask: 255.255.255.0, gw: 192.168.1.1[0m
+[0;32mI (6945) app_network: Connected with IP Address:192.168.1.26[0m
+[0;32mI (6945) app_main: Loop: Temp=-99.00C pH=7.00 Turb=0.00NTU[0m
+[0;32mI (6945) esp_rmaker_cmd_resp: Enabling Command-Response Module.[0m
+[0;32mI (6955) esp_rmaker_node: Node attribute cmd-resp created[0m
+[0;32mI (6955) esp_rmaker_param_cmd_resp: Enabling parameter command-response functionality[0m
+[0;32mI (6965) esp_rmaker_param_cmd_resp: Allocated 2048 bytes for command response buffer[0m
+[0;32mI (6975) esp_rmaker_common_cmd_resp: Registered command: cmd=1, access=7[0m
+[0;32mI (6985) esp_rmaker_param_cmd_resp: Registered standard set params command handler (id=1)[0m
+[0;32mI (6985) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (6985) esp_rmaker_local: Enabling Local Control[0m
+[0;32mI (7005) esp_rmaker_local: Local Control Service Enabled[0m
+[0;32mI (7005) esp_rmaker_local: Starting ESP Local control with HTTP Transport and security version: 1[0m
+[0;32mI (7015) mdns_mem: mDNS task will be created from internal RAM[0m
+[0;32mI (7025) esp_https_server: Starting server[0m
+[0;32mI (7025) esp_https_server: Server listening on port 8080[0m
+[0;32mI (7025) esp_rmaker_local: esp_local_ctrl service started with name : Toc4ZY3pkBJHZimJQwYBR6[0m
+[0;32mI (7035) esp_mqtt_glue: Connecting to a1p72mufdu6064-ats.iot.us-east-1.amazonaws.com[0m
+[0;32mI (7045) esp_rmaker_core: Waiting for MQTT connection[0m
+[0;32mI (7045) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (7055) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (7055) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (7265) app_driver: GPIO 27 -> ON[0m
+[1;31mE (7265) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (7265) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (7315) wifi:<ba-add>idx:1 (ifx:0, b8:29:03:b4:d2:b8), tid:1, ssn:1, winSize:64[0m
+[0;32mI (7505) esp_rmaker_time: SNTP Synchronised.[0m
+[0;32mI (7515) esp_rmaker_time: The current time is: Fri May  1 13:51:00 2026 +0800[CST], DST: No.[0m
+[0;32mI (7705) esp-x509-crt-bundle: Certificate validated[0m
+[0;32mI (9405) esp_mqtt_glue: MQTT Connected[0m
+[0;32mI (9405) esp_rmaker_cmd_resp: Checking for pending commands.[0m
+[0;32mI (9405) esp_rmaker_node_config: Generated Node config of length 2017[0m
+[0;32mI (9425) esp_rmaker_core: User node mapping done, initializing MQTT parameters.[0m
+[0;32mI (9425) esp_rmaker_param: Params MQTT Init done.[0m
+[0;32mI (9435) esp_rmaker_param: Reporting params (init): {"Servo":{"Name":"Servo","Power":false},"Temperature Sensor":{"Name":"Temperature Sensor","Temperature":-99.00000},"pH Sensor":{"pH":7.00000},"Turbidity Sensor":{"Turbidity":0.00000},"Water Pump":{"Name":"Water Pump","Power":false},"Water Drain":{"Name":"Water Drain","Power":false},"Local Control":{"POP":"da586f4f","Type":1}}[0m
+[0;32mI (9465) esp_rmaker_param: Reporting Time Series Data for Temperature Sensor.Temperature[0m
+[0;32mI (9475) esp_rmaker_ota_using_topics: Subscribing to: node/Toc4ZY3pkBJHZimJQwYBR6/otaurl[0m
+[0;32mI (12265) app_main: Loop: Temp=-99.00C pH=7.00 Turb=0.00NTU[0m
+[0;32mI (12265) esp_rmaker_param: Reporting Time Series Data for Temperature Sensor.Temperature[0m
+[0;32mI (12275) esp_rmaker_param: Reporting params: {"Temperature Sensor":{"Temperature":-99.00000},"pH Sensor":{"pH":7.00000},"Turbidity Sensor":{"Turbidity":0.00000}}[0m
+[0;32mI (12285) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":7.00000}}[0m
+[0;32mI (12285) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":0.00000}}[0m
+[0;32mI (12295) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (12305) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (12305) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (12305) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (12515) app_driver: GPIO 27 -> ON[0m
+[1;31mE (12515) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (12515) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (14755) esp_rmaker_ota_using_topics: Fetching OTA details, if any.[0m
+[0;32mI (17515) app_main: Loop: Temp=-99.00C pH=7.00 Turb=0.00NTU[0m
+[0;32mI (17515) esp_rmaker_param: Reporting Time Series Data for Temperature Sensor.Temperature[0m
+[0;32mI (17525) esp_rmaker_param: Reporting params: {"Temperature Sensor":{"Temperature":-99.00000}}[0m
+[0;32mI (17535) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":7.00000}}[0m
+[0;32mI (17535) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":0.00000}}[0m
+[0;32mI (17545) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (17545) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (17545) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (17555) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (17755) app_driver: GPIO 27 -> ON[0m
+[1;31mE (17755) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (17755) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (17875) app_driver: pH raw=845 V=0.681V pH=14.00[0m
+[0;32mI (17915) app_driver: Turbidity V=0.018 NTU=3000.00[0m
+[0;32mI (17915) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":14.00000}}[0m
+[0;32mI (17925) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":3000.00000}}[0m
+[0;32mI (17925) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (17925) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (17935) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (18135) app_driver: GPIO 27 -> ON[0m
+[1;31mE (18135) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (18135) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (18135) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (18145) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (18145) app_driver: Temp=-99.00C | pH=14.00 | Turb=3000.00NTU | Water=THAP | Mode=AUTO SENSOR[0m
+[0;32mI (22755) app_main: Loop: Temp=-99.00C pH=14.00 Turb=3000.00NTU[0m
+[0;32mI (22755) esp_rmaker_param: Reporting Time Series Data for Temperature Sensor.Temperature[0m
+[0;32mI (22765) esp_rmaker_param: Reporting params: {"Temperature Sensor":{"Temperature":-99.00000}}[0m
+[0;32mI (22765) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":14.00000}}[0m
+[0;32mI (22775) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":3000.00000}}[0m
+[0;32mI (22785) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (22785) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (22785) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (22795) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (22995) app_driver: GPIO 27 -> ON[0m
+[1;31mE (22995) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (22995) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (27995) app_main: Loop: Temp=-99.00C pH=14.00 Turb=3000.00NTU[0m
+[0;32mI (27995) esp_rmaker_param: Reporting Time Series Data for Temperature Sensor.Temperature[0m
+[0;32mI (28005) esp_rmaker_param: Reporting params: {"Temperature Sensor":{"Temperature":-99.00000}}[0m
+[0;32mI (28005) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":14.00000}}[0m
+[0;32mI (28015) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":3000.00000}}[0m
+[0;32mI (28025) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (28025) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (28025) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (28035) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (28235) app_driver: GPIO 27 -> ON[0m
+[1;31mE (28235) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (28235) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (32875) app_driver: pH raw=39 V=0.032V pH=14.00[0m
+[0;32mI (32915) app_driver: Turbidity V=0.021 NTU=3000.00[0m
+[0;32mI (32915) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":14.00000}}[0m
+[0;32mI (32925) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":3000.00000}}[0m
+[0;32mI (32935) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (32935) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (32935) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (33135) app_driver: GPIO 27 -> ON[0m
+[1;31mE (33135) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (33135) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (33135) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (33135) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (33135) app_driver: Temp=-99.00C | pH=14.00 | Turb=3000.00NTU | Water=THAP | Mode=AUTO SENSOR[0m
+[0;32mI (33235) app_main: Loop: Temp=-99.00C pH=14.00 Turb=3000.00NTU[0m
+[0;32mI (33235) esp_rmaker_param: Reporting Time Series Data for Temperature Sensor.Temperature[0m
+[0;32mI (33235) esp_rmaker_param: Reporting params: {"Temperature Sensor":{"Temperature":-99.00000}}[0m
+[0;32mI (33245) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":14.00000}}[0m
+[0;32mI (33255) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":3000.00000}}[0m
+[0;32mI (33265) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (33265) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (33265) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (33275) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (33475) app_driver: GPIO 27 -> ON[0m
+[1;31mE (33475) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (33475) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (38475) app_main: Loop: Temp=-99.00C pH=14.00 Turb=3000.00NTU[0m
+[0;32mI (38475) esp_rmaker_param: Reporting Time Series Data for Temperature Sensor.Temperature[0m
+[0;32mI (38485) esp_rmaker_param: Reporting params: {"Temperature Sensor":{"Temperature":-99.00000}}[0m
+[0;32mI (38485) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":14.00000}}[0m
+[0;32mI (38495) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":3000.00000}}[0m
+[0;32mI (38505) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (38505) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (38505) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (38515) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (38715) app_driver: GPIO 27 -> ON[0m
+[1;31mE (38715) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (38715) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (43715) app_main: Loop: Temp=-99.00C pH=14.00 Turb=3000.00NTU[0m
+[0;32mI (43715) esp_rmaker_param: Reporting Time Series Data for Temperature Sensor.Temperature[0m
+[0;32mI (43725) esp_rmaker_param: Reporting params: {"Temperature Sensor":{"Temperature":-99.00000}}[0m
+[0;32mI (43725) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":14.00000}}[0m
+[0;32mI (43735) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":3000.00000}}[0m
+[0;32mI (43745) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (43745) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (43745) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (43755) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (43955) app_driver: GPIO 27 -> ON[0m
+[1;31mE (43955) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (43955) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (47875) app_driver: pH raw=677 V=0.545V pH=14.00[0m
+[0;32mI (47915) app_driver: Turbidity V=0.025 NTU=3000.00[0m
+[0;32mI (47915) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":14.00000}}[0m
+[0;32mI (47925) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":3000.00000}}[0m
+[0;32mI (47925) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (47925) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (47935) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (48135) app_driver: GPIO 27 -> ON[0m
+[1;31mE (48135) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (48135) esp_rmaker_param: Param handle cannot be NULL.[0m
+[0;32mI (48135) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (48145) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (48145) app_driver: Temp=-99.00C | pH=14.00 | Turb=3000.00NTU | Water=THAP | Mode=AUTO SENSOR[0m
+[0;32mI (48955) app_main: Loop: Temp=-99.00C pH=14.00 Turb=3000.00NTU[0m
+[0;32mI (48955) esp_rmaker_param: Reporting Time Series Data for Temperature Sensor.Temperature[0m
+[0;32mI (48965) esp_rmaker_param: Reporting params: {"Temperature Sensor":{"Temperature":-99.00000}}[0m
+[0;32mI (48975) esp_rmaker_param: Reporting params: {"pH Sensor":{"pH":14.00000}}[0m
+[0;32mI (48975) esp_rmaker_param: Reporting params: {"Turbidity Sensor":{"Turbidity":3000.00000}}[0m
+[0;32mI (48985) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (48985) app_driver: XKC-Y26-V NPN | GPIO13=1 | Nuoc: THAP[0m
+[0;32mI (48985) app_driver: Nuoc THAP. DRAIN OFF -> PUMP ON.[0m
+[0;32mI (48995) app_driver: GPIO 19 -> OFF[0m
+[0;32mI (49195) app_driver: GPIO 27 -> ON[0m
+[1;31mE (49195) esp_rmaker_param: Param handle cannot be NULL.[0m
+[1;31mE (49195) esp_rmaker_param: Param handle cannot be NULL.[0m

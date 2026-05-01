@@ -1,0 +1,26 @@
+## IDF Component Manager Manifest File
+dependencies:
+  idf:
+    version: ">=5.0.0"
+
+  ## OLED SSD1306
+  espressif/ssd1306: "^1.0.5~1"
+
+  ## DS18B20 + OneWire — thêm 2 dòng này để fix lỗi "implicit declaration"
+  ## Phiên bản xác nhận từ dependencies.lock: ds18b20=0.3.1, onewire_bus=1.1.0
+  espressif/ds18b20: ">=0.3.1"
+  espressif/onewire_bus: ">=1.1.0"
+
+  ## RainMaker (load từ local path)
+  espressif/esp_rainmaker:
+    version: ">=1.0"
+    path: "D:/esp-rainmaker-master/components/esp_rainmaker"
+  espressif/rmaker_app_reset:
+    version: "*"
+    path: "D:/esp-rainmaker-master/examples/common/rmaker_app_reset/"
+  espressif/rmaker_app_network:
+    version: "*"
+    path: "D:/esp-rainmaker-master/examples/common/rmaker_app_network/"
+  espressif/rmaker_app_insights:
+    version: "*"
+    path: "D:/esp-rainmaker-master/examples/common/rmaker_app_insights/"

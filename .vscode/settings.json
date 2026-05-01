@@ -1,0 +1,24 @@
+{
+  "C_Cpp.intelliSenseEngine": "default",
+  "idf.portWin": "COM6",
+  "idf.adapterTargetName": "esp32",
+  "idf.openOcdConfigs": [
+    "interface/ftdi/esp32_devkitj_v1.cfg",
+    "target/esp32-solo-1.cfg"
+  ],
+  "idf.flashType": "UART",
+  "files.associations": {
+    "*.dart": "dart",
+    "app_priv.h": "c",
+    "stdint.h": "c",
+    "esp_rmaker_core.h": "c",
+    "iot_button.h": "c",
+    "esp_log.h": "c",
+    "esp_lcd_panel_ssd1306.h": "c",
+    "timers.h": "c",
+    "stdbool.h": "c",
+    "dfrobotdfplayermini.h": "c",
+    "esp_rmaker_standard_params.h": "c",
+    "esp_rmaker_standard_types.h": "c"
+  }
+}

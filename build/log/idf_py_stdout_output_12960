@@ -1,0 +1,34 @@
+[1/10] Performing build step for 'bootloader'
+[1/1] C:\WINDOWS\system32\cmd.exe /C "cd /D D:\multi_device2\build\bootloader\esp-idf\esptool_py && D:\Espressif\python_env\idf5.4_py3.11_env\Scripts\python.exe D:/Espressif/frameworks/esp-idf-v5.4.2/components/partition_table/check_sizes.py --offset 0xc000 bootloader 0x1000 D:/multi_device2/build/bootloader/bootloader.bin"
+Bootloader binary size 0x65c0 bytes. 0x4a40 bytes (42%) free.
+[2/10] No install step for 'bootloader'
+[3/10] Completed 'bootloader'
+[4/10] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/app_main.c.obj
+[5/10] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/app_driver.c.obj
+In file included from D:/multi_device2/main/app_driver.c:4:
+D:/Espressif/frameworks/esp-idf-v5.4.2/components/driver/deprecated/driver/adc.h:19:2: warning: #warning "legacy adc driver is deprecated, please migrate to use esp_adc/adc_oneshot.h and esp_adc/adc_continuous.h for oneshot mode and continuous mode drivers respectively" [-Wcpp]
+   19 | #warning "legacy adc driver is deprecated, please migrate to use esp_adc/adc_oneshot.h and esp_adc/adc_continuous.h for oneshot mode and continuous mode drivers respectively"
+      |  ^~~~~~~
+D:/multi_device2/main/app_driver.c: In function 'app_driver_init':
+D:/multi_device2/main/app_driver.c:489:5: warning: 'ssd1306_create' is deprecated: This driver is DEPRECATED. Please use updated SSD1306 driver from ESP-IDF. [-Wdeprecated-declarations]
+  489 |     ssd1306_dev = ssd1306_create(I2C_MASTER_NUM, SSD1306_I2C_ADDRESS);
+      |     ^~~~~~~~~~~
+In file included from D:/multi_device2/main/app_driver.c:7:
+D:/multi_device2/managed_components/espressif__ssd1306/include/ssd1306.h:53:18: note: declared here
+   53 | ssd1306_handle_t ssd1306_create(i2c_port_t port, uint16_t dev_addr)
+      |                  ^~~~~~~~~~~~~~
+D:/multi_device2/main/app_driver.c: At top level:
+D:/multi_device2/main/app_driver.c:355:13: warning: 'set_power_state' defined but not used [-Wunused-function]
+  355 | static void set_power_state(bool target)
+      |             ^~~~~~~~~~~~~~~
+[6/10] Linking C static library esp-idf\main\libmain.a
+[7/10] Generating ld/sections.ld
+[8/10] Linking CXX executable multi_device1.elf
+[9/10] Generating binary image from built executable
+esptool.py v4.8.1
+Creating esp32 image...
+Merged 2 ELF sections
+Successfully created esp32 image.
+Generated D:/multi_device2/build/multi_device1.bin
+[10/10] C:\WINDOWS\system32\cmd.exe /C "cd /D D:\multi_device2\build\esp-idf\esptool_py && D:\Espressif\python_env\idf5.4_py3.11_env\Scripts\python.exe D:/Espressif/frameworks/esp-idf-v5.4.2/components/partition_table/check_sizes.py --offset 0xc000 partition --type app D:/multi_device2/build/partition_table/partition-table.bin D:/multi_device2/build/multi_device1.bin"
+multi_device1.bin binary size 0x1740f0 bytes. Smallest app partition is 0x1e0000 bytes. 0x6bf10 bytes (22%) free.
