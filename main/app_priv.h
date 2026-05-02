@@ -13,7 +13,6 @@
 
 /* =========================================================
  *  GPIO ĐIỀU KHIỂN
- *
  *  WATER_LEVEL_GPIO = 13  (cảm biến XKC-Y26-V, NPN)
  *    LOW  (0) = có nước → mức CAO → bật van xả DRAIN (GPIO 19)
  *    HIGH (1) = không nước → mức THẤP → bật bơm cấp PUMP (GPIO 27)
@@ -24,8 +23,6 @@
 
 /* =========================================================
  *  I2C – OLED SSD1306
- *  SSD1306_I2C_ADDRESS (0x3C) đã định nghĩa trong ssd1306.h
- *  KHÔNG định nghĩa lại ở đây để tránh warning "redefined".
  * ========================================================= */
 #define I2C_MASTER_SCL_IO   22
 #define I2C_MASTER_SDA_IO   21
@@ -43,17 +40,7 @@
 #define DEFAULT_PH              7.0f
 #define DEFAULT_NTU             0.0f
 
-/*
- *  HIEU CHUAN pH – Module PH-4502C
- *
- *  Buoc 1: De PH_OFFSET = 0.0f, build va nap code
- *  Buoc 2: Nhung cam bien vao dung dich buffer pH 7.0
- *  Buoc 3: Doc gia tri tren OLED hoac Serial monitor
- *  Buoc 4: Neu OLED hien thi 7.4 → PH_OFFSET = -0.4f
- *           Neu OLED hien thi 6.6 → PH_OFFSET = +0.4f
- *  Buoc 5: Build lai, kiem tra lai, chinh tiep neu can
- */
-#define PH_OFFSET   0.0f   /* Thay doi gia tri nay de hieu chuan */
+#define PH_OFFSET   0.0f   
 
 /* =========================================================
  *  SERVO – xung PWM
@@ -62,11 +49,6 @@
 #define ServoMsMax  2.1f
 #define ServoMsAvg  ((ServoMsMax - ServoMsMin) / 2.0f)
 
-/* =========================================================
- *  TÊN PARAM RAINMAKER
- *  Định nghĩa một lần ở đây để app_driver.c và app_main.c
- *  luôn dùng chung — tránh lỗi null pointer do gõ sai tên.
- * ========================================================= */
 #define RMAKER_PARAM_PH         "pH"
 #define RMAKER_PARAM_TURBIDITY  "Turbidity"
 

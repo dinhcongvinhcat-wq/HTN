@@ -28,23 +28,6 @@
 static const char *TAG = "app_driver";
 
 /* =========================================================
- *  CẢM BIẾN MỰC NƯỚC XKC-Y26-V
- *
- *  Loại: NPN open-collector, nguồn 5V
- *    Có nước (đạt mức) → OUT = LOW  (kéo xuống GND, 0V) ← an toàn ESP32
- *    Không có nước     → OUT = HIGH (pull-up kéo lên)
- *
- *  Kết nối:
- *    VCC cảm biến ──── 5V
- *    GND cảm biến ──── GND chung ESP32
- *    OUT          ──── GPIO 13 (dùng PULL_UP nội, không cần điện trở ngoài)
- *
- *  Logic điều khiển (ĐƠN GIẢN, không có trường hợp nào chạy cùng lúc):
- *    GPIO 13 = LOW  (nước ĐẦY) → DRAIN ON,  PUMP OFF
- *    GPIO 13 = HIGH (nước THẤP)→ DRAIN OFF, PUMP ON
- * ========================================================= */
-
-/* =========================================================
  *  BIẾN TOÀN CỤC NỘI BỘ
  * ========================================================= */
 static TimerHandle_t sensor_timer;
@@ -60,9 +43,7 @@ static ssd1306_handle_t ssd1306_dev = NULL;
 static onewire_bus_handle_t    ow_bus  = NULL;
 static ds18b20_device_handle_t ds18b20 = NULL;
 
-/* =========================================================
- *  PROTOTYPE
- * ========================================================= */
+
 void display_sensor_data(void);
 
 /* =========================================================
@@ -198,12 +179,7 @@ static float read_turbidity_sensor(void)
     return NTU;
 }
 
-/* =========================================================
- *  CẢM BIẾN MỰC NƯỚC XKC-Y26-V (NPN)
- *
- *  Trả về true  = nước ĐẦY  (GPIO LOW)
- *  Trả về false = nước THẤP (GPIO HIGH)
- * ========================================================= */
+
 static bool is_water_level_high(void)
 {
     int level = gpio_get_level(WATER_LEVEL_GPIO);
@@ -222,26 +198,6 @@ void control_gpio(int gpio, bool state)
     ESP_LOGI(TAG, "GPIO %d -> %s", gpio, state ? "ON" : "OFF");
 }
 
-/* =========================================================
- *  LOGIC TỰ ĐỘNG
- *
- *  Chỉ có 2 trường hợp, DRAIN và PUMP KHÔNG BAO GIỜ chạy cùng lúc:
- *
- *  Nước ĐẦY  (GPIO 13 = LOW)  → DRAIN ON,  PUMP OFF
- *  Nước THẤP (GPIO 13 = HIGH) → DRAIN OFF, PUMP ON
- * ========================================================= */
-/* =========================================================
- *  TẮT BROWNOUT DETECTOR
- *
- *  Relay kéo dòng đột ngột khi bơm khởi động có thể làm sụt
- *  áp nguồn 3.3V xuống dưới ngưỡng brownout (~2.43V) khiến
- *  ESP32 tự reset. Hàm này vô hiệu hóa bộ phát hiện đó.
- *
- *  KHUYẾN CÁO phần cứng (quan trọng hơn):
- *    - Tụ 1000µF/16V song song nguồn 5V gần relay
- *    - Diode 1N4007 song song cuộn relay (chặn back-EMF)
- *    - Nguồn 5V riêng cho relay, chỉ chung GND với ESP32
- * ========================================================= */
 static void disable_brownout_detector(void)
 {
     WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
@@ -252,11 +208,10 @@ void check_sensor_and_control(void)
 {
     
     if (is_water_level_high()) {
-        /* ── Nước ĐẦY: tắt bơm TRƯỚC, rồi mới bật xả ── */
         ESP_LOGW(TAG, "Nuoc DAY! PUMP OFF -> DRAIN ON.");
 
         control_gpio(PUMP_GPIO,  false);
-        vTaskDelay(pdMS_TO_TICKS(200)); /* chờ relay nhả hoàn toàn */
+        vTaskDelay(pdMS_TO_TICKS(200));
         control_gpio(DRAIN_GPIO, true);
 
         esp_rmaker_raise_alert("Water FULL - draining");
@@ -269,15 +224,13 @@ void check_sensor_and_control(void)
             esp_rmaker_bool(true));
 
     } else {
-        /* ── Nước THẤP: tắt xả TRƯỚC, rồi mới bật bơm ── */
         ESP_LOGI(TAG, "Nuoc THAP. DRAIN OFF -> PUMP ON.");
 
         control_gpio(DRAIN_GPIO, false);
-        vTaskDelay(pdMS_TO_TICKS(200)); /* chờ relay nhả hoàn toàn */
+        vTaskDelay(pdMS_TO_TICKS(200)); 
 
         control_gpio(PUMP_GPIO,  true);
 
-        
         esp_rmaker_param_update_and_report(
             esp_rmaker_device_get_param_by_type(drain_device, ESP_RMAKER_DEF_POWER_NAME),
             esp_rmaker_bool(false));
@@ -517,12 +470,10 @@ void app_driver_init(void)
     display_sensor_data();
 }
 
-/* =========================================================
- *  API CÔNG KHAI
- * ========================================================= */
+
 int app_driver_set_state(bool state)
 {
-    g_power_state = true; // đang dùng app
+    g_power_state = true; 
 
     if (state) {
         control_gpio(DRAIN_GPIO, false);

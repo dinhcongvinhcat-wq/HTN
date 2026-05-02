@@ -12,12 +12,9 @@
 
 #include <app_network.h>
 #include <app_insights.h>
-
 #include "app_priv.h"
 
 static const char *TAG = "app_main";
-
-
 extern bool g_power_state;
 
 /* ========================================================= */
@@ -194,7 +191,6 @@ void app_main(void)
 
         display_sensor_data();
 
-        /* 🔥 CHỈ AUTO MỚI CHẠY */
         if (g_power_state == false) {
             check_sensor_and_control();
         }
