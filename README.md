@@ -24,7 +24,7 @@ Hệ thống giúp người dùng theo dõi và điều khiển hồ cá từ xa
 
 * Tự động **bơm nước** khi cần
 * **Xả nước** khi chất lượng không đạt
-* Điều khiển **servo (cho ăn / cơ cấu)**
+* Điều khiển **servo (cho ăn)**
 
 ---
 
