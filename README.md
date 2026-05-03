@@ -66,33 +66,6 @@ Hệ thống giúp người dùng theo dõi và điều khiển hồ cá từ xa
 * MOSFET Driver
 * OLED SH1106
 
----
-
-## 📊 Kiến trúc hệ thống
-
-```mermaid
-graph TD
-A[Cảm biến] --> B[ESP32]
-B --> C[Xử lý dữ liệu]
-C --> D[ESP RainMaker Cloud]
-D --> E[Mobile App]
-C --> F[Điều khiển thiết bị]
-```
-
----
-
-## 📷 Hình ảnh hệ thống
-
-### 🔧 Mô hình phần cứng
-
-*(Theo báo cáo trang 9)*
-
-### 📱 Giao diện ứng dụng
-
-*(Hiển thị trạng thái và biểu đồ dữ liệu)*
-
----
-
 ## ✅ Ưu điểm
 
 * Giao diện app dễ sử dụng
