@@ -415,15 +415,6 @@ CONFIG_EXAMPLE_OUTPUT_GPIO=19
 # end of Example Configuration
 
 #
-# DFPlayerMini Configuration
-#
-CONFIG_GPIO_RANGE_MAX=33
-CONFIG_TX_GPIO=4
-CONFIG_RX_GPIO=5
-# CONFIG_DEBUG_MODE is not set
-# end of DFPlayerMini Configuration
-
-#
 # ESP RainMaker Config
 #
 # CONFIG_ESP_RMAKER_NO_CLAIM is not set

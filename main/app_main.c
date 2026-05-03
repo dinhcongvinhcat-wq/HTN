@@ -4,17 +4,19 @@
 #include <freertos/task.h>
 #include <esp_log.h>
 #include <nvs_flash.h>
-
 #include <esp_rmaker_core.h>
 #include <esp_rmaker_standard_params.h>
 #include <esp_rmaker_standard_devices.h>
 #include <esp_rmaker_standard_types.h>
-
 #include <app_network.h>
 #include <app_insights.h>
 #include "app_priv.h"
+extern int app_driver_set_servo(bool state);
 
 static const char *TAG = "app_main";
+esp_rmaker_device_t *servo_device;
+extern bool water_sensor_enable;
+esp_rmaker_device_t *level_sensor_switch;
 extern bool g_power_state;
 
 /* ========================================================= */
@@ -23,12 +25,11 @@ esp_rmaker_device_t *ph_sensor_device;
 esp_rmaker_device_t *turbidity_sensor_device;
 esp_rmaker_device_t *pump_device;
 esp_rmaker_device_t *drain_device;
-esp_rmaker_device_t *servo_device;
+
 
 esp_rmaker_param_t *ph_param;
 esp_rmaker_param_t *turb_param;
 
-/* ========================================================= */
 static void report_water_quality(void)
 {
     esp_rmaker_param_update_and_report(ph_param,
@@ -37,27 +38,24 @@ static void report_water_quality(void)
         esp_rmaker_float(app_get_current_turbidity()));
 }
 
-/* ========================================================= */
 /* SERVO */
-static esp_err_t write_cb(const esp_rmaker_device_t *device,
-                          const esp_rmaker_param_t *param,
-                          const esp_rmaker_param_val_t val,
-                          void *priv_data,
-                          esp_rmaker_write_ctx_t *ctx)
+static esp_err_t level_sensor_write_cb(const esp_rmaker_device_t *device,
+                                       const esp_rmaker_param_t *param,
+                                       const esp_rmaker_param_val_t val,
+                                       void *priv_data,
+                                       esp_rmaker_write_ctx_t *ctx)
 {
-    if (strcmp(esp_rmaker_param_get_name(param), ESP_RMAKER_DEF_POWER_NAME) == 0)
-    {
-        if (strcmp(esp_rmaker_device_get_name(device), "Servo") == 0) {
-            app_driver_set_state(val.val.b);
-            ESP_LOGI(TAG, "Servo -> %s", val.val.b ? "ON" : "OFF");
-        }
-        report_water_quality();
+    if (strcmp(esp_rmaker_param_get_name(param), ESP_RMAKER_DEF_POWER_NAME) == 0) {
+
+        water_sensor_enable = val.val.b;
+
+        ESP_LOGI(TAG, "Water Sensor -> %s", val.val.b ? "ON" : "OFF");
     }
+
     esp_rmaker_param_update(param, val);
     return ESP_OK;
 }
 
-/* ========================================================= */
 /* BƠM */
 static esp_err_t pump_write_cb(const esp_rmaker_device_t *device,
                                const esp_rmaker_param_t *param,
@@ -68,7 +66,7 @@ static esp_err_t pump_write_cb(const esp_rmaker_device_t *device,
     if (strcmp(esp_rmaker_param_get_name(param), ESP_RMAKER_DEF_POWER_NAME) == 0) {
 
         if (val.val.b) {
-            g_power_state = true;   // APP điều khiển
+            g_power_state = true;   
 
             control_gpio(DRAIN_GPIO, false);
             vTaskDelay(pdMS_TO_TICKS(200));
@@ -76,7 +74,7 @@ static esp_err_t pump_write_cb(const esp_rmaker_device_t *device,
 
         } else {
             control_gpio(PUMP_GPIO, false);
-            g_power_state = false;  // tắt app -> AUTO cảm biến chạy lại
+            g_power_state = false;  
         }
 
         ESP_LOGI(TAG, "Pump -> %s", val.val.b ? "ON" : "OFF");
@@ -85,8 +83,9 @@ static esp_err_t pump_write_cb(const esp_rmaker_device_t *device,
     esp_rmaker_param_update(param, val);
     return ESP_OK;
 }
-/* ========================================================= */
+
 /* XẢ */
+
 static esp_err_t drain_write_cb(const esp_rmaker_device_t *device,
                                 const esp_rmaker_param_t *param,
                                 const esp_rmaker_param_val_t val,
@@ -96,7 +95,7 @@ static esp_err_t drain_write_cb(const esp_rmaker_device_t *device,
     if (strcmp(esp_rmaker_param_get_name(param), ESP_RMAKER_DEF_POWER_NAME) == 0) {
 
         if (val.val.b) {
-            g_power_state = true;   // APP điều khiển
+            g_power_state = true;   
 
             control_gpio(PUMP_GPIO, false);
             vTaskDelay(pdMS_TO_TICKS(200));
@@ -104,7 +103,7 @@ static esp_err_t drain_write_cb(const esp_rmaker_device_t *device,
 
         } else {
             control_gpio(DRAIN_GPIO, false);
-            g_power_state = false;  // tắt app -> AUTO cảm biến chạy lại
+            g_power_state = false;  
         }
 
         ESP_LOGI(TAG, "Drain -> %s", val.val.b ? "ON" : "OFF");
@@ -114,8 +113,23 @@ static esp_err_t drain_write_cb(const esp_rmaker_device_t *device,
     esp_rmaker_param_update(param, val);
     return ESP_OK;
 }
+static esp_err_t servo_write_cb(const esp_rmaker_device_t *device,
+                                const esp_rmaker_param_t *param,
+                                const esp_rmaker_param_val_t val,
+                                void *priv_data,
+                                esp_rmaker_write_ctx_t *ctx)
+{
+    if (strcmp(esp_rmaker_param_get_name(param), ESP_RMAKER_DEF_POWER_NAME) == 0) {
 
-/* ========================================================= */
+        app_driver_set_servo(val.val.b);
+
+        ESP_LOGI("app_main", "Servo -> %s", val.val.b ? "ON" : "OFF");
+    }
+
+    esp_rmaker_param_update(param, val);
+    return ESP_OK;
+}
+
 void app_main(void)
 {
     app_driver_init();
@@ -133,9 +147,9 @@ void app_main(void)
     esp_rmaker_node_t *node = esp_rmaker_node_init(&cfg, "Water Monitor", "ESP32");
 
     /* Servo */
-    servo_device = esp_rmaker_switch_device_create("Servo", NULL, false);
-    esp_rmaker_device_add_cb(servo_device, write_cb, NULL);
-    esp_rmaker_node_add_device(node, servo_device);
+   servo_device = esp_rmaker_switch_device_create("Servo", NULL, false);
+   esp_rmaker_device_add_cb(servo_device, servo_write_cb, NULL);  
+   esp_rmaker_node_add_device(node, servo_device);
 
     /* Temp */
     temp_sensor_device = esp_rmaker_temp_sensor_device_create(
@@ -168,9 +182,16 @@ void app_main(void)
     esp_rmaker_device_add_cb(drain_device, drain_write_cb, NULL);
     esp_rmaker_node_add_device(node, drain_device);
 
+
     esp_rmaker_ota_enable_default();
     esp_rmaker_start();
     app_network_start(POP_TYPE_RANDOM);
+    /* Water Level Sensor Switch */
+level_sensor_switch = esp_rmaker_switch_device_create(
+    "Water Level Sensor", NULL, true);
+
+esp_rmaker_device_add_cb(level_sensor_switch, level_sensor_write_cb, NULL);
+esp_rmaker_node_add_device(node, level_sensor_switch);
 
     /* LOOP */
     while (1) {
