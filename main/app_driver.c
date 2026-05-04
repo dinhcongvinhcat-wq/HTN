@@ -1,13 +1,13 @@
 #include <sdkconfig.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
+#include <freertos/semphr.h>
+#include <freertos/queue.h>
 #include <driver/adc.h>
 #include "driver/ledc.h"
 #include <driver/i2c.h>
-#include <driver/uart.h>
 #include "ssd1306.h"
 #include <esp_log.h>
-#include <math.h>
 #include <driver/i2c_master.h>
 #include <esp_adc/adc_oneshot.h>
 #include "soc/rtc_cntl_reg.h"
@@ -19,25 +19,39 @@
 #include <esp_rmaker_standard_params.h>
 #include <app_reset.h>
 #include "app_priv.h"
+/* ── Định nghĩa nội bộ cho queue ── */
+#define SENSOR_QUEUE_LENGTH  8
+
+typedef struct {
+    float temperature;
+    float ph;
+    float turbidity;
+} sensor_data_t;
 
 bool water_sensor_enable = true;
 extern int app_driver_set_servo(bool state);
 
 static const char *TAG = "app_driver";
 
-/* ======= BIẾN TOÀN CỤC NỘI BỘ========= */
+/* ======= BIẾN TOÀN CỤC NỘI BỘ ========= */
 static TimerHandle_t sensor_timer;
 
 static float g_temperature     = -99.0f;
 static float g_ph_value        = DEFAULT_PH;
 static float g_turbidity_value = DEFAULT_NTU;
- bool  g_power_state     = false;
+bool         g_power_state     = false;
 
 static ssd1306_handle_t ssd1306_dev = NULL;
 
 /* DS18B20 */
 static onewire_bus_handle_t    ow_bus  = NULL;
 static ds18b20_device_handle_t ds18b20 = NULL;
+
+/* ============FREERTOS IPC HANDLES ================== */
+SemaphoreHandle_t g_sensor_mutex       = NULL;  /* Mutex bảo vệ biến cảm biến  */
+SemaphoreHandle_t g_ds18b20_ready_sem  = NULL;  /* Binary semaphore DS18B20     */
+SemaphoreHandle_t g_dirty_count_sem    = NULL;  /* Counting semaphore độ đục    */
+QueueHandle_t     g_sensor_queue       = NULL;  /* Queue truyền sensor_data_t   */
 
 /* =======PROTOTYPE========== */
 void display_sensor_data(void);
@@ -101,20 +115,53 @@ static float read_ds18b20_temperature(void)
     return temp;
 }
 
-/* =================TASK ĐỌC DS18B20====================== */
+/* =================TASK ĐỌC DS18B20=================== */
 static void ds18b20_task(void *arg)
 {
     while (1) {
         float temp = read_ds18b20_temperature();
+
         if (temp != -99.0f) {
-            g_temperature = temp;
+           
+            if (xSemaphoreTake(g_sensor_mutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+                g_temperature = temp;
+                xSemaphoreGive(g_sensor_mutex);
+            } else {
+                ESP_LOGW(TAG, "ds18b20_task: khong lay duoc mutex");
+            }
+
+            xSemaphoreGive(g_ds18b20_ready_sem);
+            ESP_LOGD(TAG, "ds18b20_task: give binary semaphore");
+
+            sensor_data_t snap;
+            if (xSemaphoreTake(g_sensor_mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+                snap.temperature = g_temperature;
+                snap.ph          = g_ph_value;
+                snap.turbidity   = g_turbidity_value;
+                xSemaphoreGive(g_sensor_mutex);
+            } else {
+                snap.temperature = temp;
+                snap.ph          = DEFAULT_PH;
+                snap.turbidity   = DEFAULT_NTU;
+            }
+
+            if (xQueueSend(g_sensor_queue, &snap, pdMS_TO_TICKS(10)) != pdTRUE) {
+                ESP_LOGW(TAG, "ds18b20_task: queue day, bo qua ban tin");
+            }
+
+            /* --- Cập nhật RainMaker --- */
             esp_rmaker_param_update_and_report(
                 esp_rmaker_device_get_param_by_type(
                     temp_sensor_device, ESP_RMAKER_PARAM_TEMPERATURE),
-                esp_rmaker_float(g_temperature));
+                esp_rmaker_float(temp));
+
         } else {
-            g_temperature = -99.0f;
+            if (xSemaphoreTake(g_sensor_mutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+                g_temperature = -99.0f;
+                xSemaphoreGive(g_sensor_mutex);
+            }
         }
+
         display_sensor_data();
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
@@ -143,11 +190,11 @@ static float read_ph_sensor(void)
         avgval += buffer_arr[i];
     }
     float voltage = (float)avgval * 3.3f / 4095.0f / 6.0f;
-    float calibration_value = 22.84f; 
+    float calibration_value = 22.84f;
     float ph_act = -5.70f * voltage + calibration_value;
 
-    ESP_LOGI(TAG, "pH ADC Raw: %lu | Voltage: %.2fV | pH Value: %.2f", avgval/6, voltage, ph_act);
-    
+    ESP_LOGI(TAG, "pH ADC Raw: %lu | Voltage: %.2fV | pH Value: %.2f",
+             avgval / 6, voltage, ph_act);
     return ph_act;
 }
 
@@ -160,24 +207,22 @@ static float read_turbidity_sensor(void)
         vTaskDelay(pdMS_TO_TICKS(2));
     }
 
-    float raw = sum / 50.0f;
+    float raw     = sum / 50.0f;
     float voltage = raw * 3.3f / 4095.0f;
-    ESP_LOGI(TAG, "Voltage = %.3f", voltage);
-    float V_clean = 2.6f;   
-    float NTU = (V_clean - voltage) * 1500;
-    if (NTU < 0) NTU = 0;
+    float V_clean = 2.6f;
+    float NTU     = (V_clean - voltage) * 1500;
+    if (NTU < 0)    NTU = 0;
     if (NTU > 3000) NTU = 3000;
 
     ESP_LOGI(TAG, "RAW=%.0f  V=%.2f  NTU=%.2f", raw, voltage, NTU);
-
     return NTU;
 }
 
 /* ===========CẢM BIẾN MỰC NƯỚC XKC-Y26-V (PNP)===== */
 static bool is_water_level_high(void)
 {
-    int level = gpio_get_level(WATER_LEVEL_GPIO);
-    bool is_full = (level == 1); /* PNP: HIGH = có nước = ĐẦY */
+    int  level   = gpio_get_level(WATER_LEVEL_GPIO);
+    bool is_full = (level == 1);
     ESP_LOGI(TAG, "XKC-Y26-V PNP | GPIO%d=%d | Nuoc: %s",
              WATER_LEVEL_GPIO, level, is_full ? "DAY" : "THAP");
     return is_full;
@@ -193,7 +238,7 @@ void control_gpio(int gpio, bool state)
 static void disable_brownout_detector(void)
 {
     WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
-    ESP_LOGW(TAG, "Brownout detector DA TAT — dam bao phan cung on dinh!");
+    ESP_LOGW(TAG, "Brownout detector DA TAT");
 }
 
 void check_sensor_and_control(void)
@@ -207,9 +252,7 @@ void check_sensor_and_control(void)
     bool water_dirty = (g_turbidity_value > TURBIDITY_THRESHOLD_NTU);
 
     if (!water_full) {
-        /* ── BƯỚC 1: Nước THẤP → bơm vào, không xả ── */
         ESP_LOGI(TAG, "Nuoc THAP -> DRAIN OFF, PUMP ON.");
-
         control_gpio(DRAIN_GPIO, false);
         vTaskDelay(pdMS_TO_TICKS(200));
         control_gpio(PUMP_GPIO, true);
@@ -222,9 +265,8 @@ void check_sensor_and_control(void)
             esp_rmaker_bool(true));
 
     } else if (!water_dirty) {
-        /* ── BƯỚC 2: Nước ĐẦY + SẠCH → giữ nguyên, tắt cả hai ── */
-        ESP_LOGI(TAG, "Nuoc DAY + SACH (%.0f NTU) -> PUMP OFF, DRAIN OFF.", g_turbidity_value);
-
+        ESP_LOGI(TAG, "Nuoc DAY + SACH (%.0f NTU) -> PUMP OFF, DRAIN OFF.",
+                 g_turbidity_value);
         control_gpio(PUMP_GPIO,  false);
         vTaskDelay(pdMS_TO_TICKS(200));
         control_gpio(DRAIN_GPIO, false);
@@ -237,46 +279,47 @@ void check_sensor_and_control(void)
             esp_rmaker_bool(false));
 
     } else {
-        /* ── BƯỚC 3: Nước ĐẦY + BẨN → tắt bơm, bật xả ──
-         * Khi xả làm nước THẤP, lần timer tiếp theo sẽ rơi vào
-         * nhánh !water_full ở trên → tắt xả, bơm lại.            */
-        ESP_LOGW(TAG, "Nuoc DAY + BAN (%.0f NTU > %.0f) -> PUMP OFF, DRAIN ON.",
-                 g_turbidity_value, (float)TURBIDITY_THRESHOLD_NTU);
+        /* ── Nước ĐẦY + BẨN ── */
+        if (xSemaphoreTake(g_dirty_count_sem, 0) == pdTRUE) {
+            ESP_LOGW(TAG, "Nuoc DAY + BAN (%.0f NTU > %.0f) -> PUMP OFF, DRAIN ON. "
+                          "[counting sem taken]",
+                     g_turbidity_value, (float)TURBIDITY_THRESHOLD_NTU);
 
-        control_gpio(PUMP_GPIO, false);
-        vTaskDelay(pdMS_TO_TICKS(200));
-        control_gpio(DRAIN_GPIO, true);
+            control_gpio(PUMP_GPIO, false);
+            vTaskDelay(pdMS_TO_TICKS(200));
+            control_gpio(DRAIN_GPIO, true);
 
-        esp_rmaker_raise_alert("Water DIRTY - draining");
-
-        esp_rmaker_param_update_and_report(
-            esp_rmaker_device_get_param_by_type(pump_device,  ESP_RMAKER_DEF_POWER_NAME),
-            esp_rmaker_bool(false));
-        esp_rmaker_param_update_and_report(
-            esp_rmaker_device_get_param_by_type(drain_device, ESP_RMAKER_DEF_POWER_NAME),
-            esp_rmaker_bool(true));
+            esp_rmaker_raise_alert("Water DIRTY - draining");
+            esp_rmaker_param_update_and_report(
+                esp_rmaker_device_get_param_by_type(pump_device,  ESP_RMAKER_DEF_POWER_NAME),
+                esp_rmaker_bool(false));
+            esp_rmaker_param_update_and_report(
+                esp_rmaker_device_get_param_by_type(drain_device, ESP_RMAKER_DEF_POWER_NAME),
+                esp_rmaker_bool(true));
+        } else {
+            ESP_LOGI(TAG, "Nuoc BAN nhung counting sem = 0, cho chu ky tiep theo.");
+        }
     }
 }
 
 /* ==============SERVO==================== */
- void servo_set_angle(int angle)
+void servo_set_angle(int angle)
 {
-    int us = 500 + (angle * 2000 / 180);   // 0–180 độ
-    uint32_t duty = (us * 8191) / 20000;   // 13-bit PWM
-
+    int      us   = 500 + (angle * 2000 / 180);
+    uint32_t duty = (us * 8191) / 20000;
     ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
     ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
 }
 
 static void app_indicator_set(bool state)
 {
-   if (state) {
-    servo_set_angle(180);
-    ESP_LOGI(TAG, "Servo ON 180 do");
-} else {
-    servo_set_angle(90);
-    ESP_LOGI(TAG, "Servo OFF 90 do");
-}
+    if (state) {
+        servo_set_angle(180);
+        ESP_LOGI(TAG, "Servo ON 180 do");
+    } else {
+        servo_set_angle(90);
+        ESP_LOGI(TAG, "Servo OFF 90 do");
+    }
 }
 
 static void app_indicator_init(void)
@@ -309,16 +352,41 @@ static void set_power_state(bool target)
     app_indicator_set(target);
 }
 
-/* ==================TIMER CALLBACK — đọc pH, độ đục, kiểm tra mực nước============== */
+/* ==================TIMER CALLBACK — đọc pH, độ đục, kiểm tra mực nước==============*/
 static void app_sensor_update(TimerHandle_t handle)
 {
-    g_ph_value        = read_ph_sensor();
-    g_turbidity_value = read_turbidity_sensor();
+    float ph_new   = read_ph_sensor();
+    float turb_new = read_turbidity_sensor();
+
+    if (xSemaphoreTake(g_sensor_mutex, pdMS_TO_TICKS(200)) == pdTRUE) {
+        g_ph_value        = ph_new;
+        g_turbidity_value = turb_new;
+        xSemaphoreGive(g_sensor_mutex);
+    } else {
+        ESP_LOGW(TAG, "app_sensor_update: khong lay duoc mutex, ghi truc tiep");
+        g_ph_value        = ph_new;
+        g_turbidity_value = turb_new;
+    }
+
+    /* --- a) Binary Semaphore: kiểm tra nhiệt độ mới từ DS18B20 task --- */
+    if (xSemaphoreTake(g_ds18b20_ready_sem, 0) == pdTRUE) {
+        ESP_LOGD(TAG, "app_sensor_update: co nhiet do moi tu DS18B20 task");
+    } else {
+        ESP_LOGD(TAG, "app_sensor_update: chua co nhiet do moi, dung gia tri cu");
+    }
+
+    /* --- c) Counting Semaphore: ghi nhận sự kiện nước bẩn --- */
+    if (turb_new > TURBIDITY_THRESHOLD_NTU) {
+        if (xSemaphoreGive(g_dirty_count_sem) == pdTRUE) {
+            ESP_LOGW(TAG, "Nuoc BAN %.0f NTU: give counting sem", turb_new);
+        } else {
+            ESP_LOGW(TAG, "Counting sem DAY (max 5), bo qua su kien ban lan nay");
+        }
+    }
 
     esp_rmaker_param_update_and_report(
         esp_rmaker_device_get_param_by_name(ph_sensor_device, RMAKER_PARAM_PH),
         esp_rmaker_float(g_ph_value));
-
     esp_rmaker_param_update_and_report(
         esp_rmaker_device_get_param_by_name(turbidity_sensor_device, RMAKER_PARAM_TURBIDITY),
         esp_rmaker_float(g_turbidity_value));
@@ -337,7 +405,7 @@ static void app_sensor_update(TimerHandle_t handle)
              g_power_state ? "APP" : "AUTO SENSOR");
 }
 
-/* ==============I2C & OLED SSD1306====================== */
+/* ==============I2C & OLED SSD1306=================== */
 void i2c_master_init(void)
 {
     i2c_config_t conf = {
@@ -375,10 +443,80 @@ void display_sensor_data(void)
     ssd1306_refresh_gram(ssd1306_dev);
 }
 
-/* ===============GETTER====================== */
-float app_get_current_temperature(void) { return g_temperature;     }
-float app_get_current_ph(void)          { return g_ph_value;        }
-float app_get_current_turbidity(void)   { return g_turbidity_value; }
+/* ===============GETTER==================== */
+float app_get_current_temperature(void)
+{
+    float val;
+    if (xSemaphoreTake(g_sensor_mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+        val = g_temperature;
+        xSemaphoreGive(g_sensor_mutex);
+    } else {
+        val = g_temperature;  
+    }
+    return val;
+}
+
+float app_get_current_ph(void)
+{
+    float val;
+    if (xSemaphoreTake(g_sensor_mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+        val = g_ph_value;
+        xSemaphoreGive(g_sensor_mutex);
+    } else {
+        val = g_ph_value;
+    }
+    return val;
+}
+
+float app_get_current_turbidity(void)
+{
+    float val;
+    if (xSemaphoreTake(g_sensor_mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+        val = g_turbidity_value;
+        xSemaphoreGive(g_sensor_mutex);
+    } else {
+        val = g_turbidity_value;
+    }
+    return val;
+}
+
+/* ================KHỞI TẠO IPC ================== */
+static esp_err_t ipc_init(void)
+{
+    /* 1. Mutex */
+    g_sensor_mutex = xSemaphoreCreateMutex();
+    if (g_sensor_mutex == NULL) {
+        ESP_LOGE(TAG, "Tao mutex that bai");
+        return ESP_FAIL;
+    }
+    ESP_LOGI(TAG, "Mutex g_sensor_mutex OK");
+
+    /* 2. Binary Semaphore */
+    g_ds18b20_ready_sem = xSemaphoreCreateBinary();
+    if (g_ds18b20_ready_sem == NULL) {
+        ESP_LOGE(TAG, "Tao binary semaphore that bai");
+        return ESP_FAIL;
+    }
+    ESP_LOGI(TAG, "Binary Semaphore g_ds18b20_ready_sem OK");
+
+    /* 3. Counting Semaphore  */
+    g_dirty_count_sem = xSemaphoreCreateCounting(5, 0);
+    if (g_dirty_count_sem == NULL) {
+        ESP_LOGE(TAG, "Tao counting semaphore that bai");
+        return ESP_FAIL;
+    }
+    ESP_LOGI(TAG, "Counting Semaphore g_dirty_count_sem OK (max=5)");
+
+    /* 4. Queue — */
+    g_sensor_queue = xQueueCreate(SENSOR_QUEUE_LENGTH, sizeof(sensor_data_t));
+    if (g_sensor_queue == NULL) {
+        ESP_LOGE(TAG, "Tao queue that bai");
+        return ESP_FAIL;
+    }
+    ESP_LOGI(TAG, "Queue g_sensor_queue OK (capacity=%d)", SENSOR_QUEUE_LENGTH);
+
+    return ESP_OK;
+}
 
 /* ===============KHỞI TẠO CẢM BIẾN=================== */
 esp_err_t app_sensor_init(void)
@@ -388,9 +526,7 @@ esp_err_t app_sensor_init(void)
     adc1_config_channel_atten(PH_SENSOR_GPIO,        ADC_ATTEN_DB_12);
     adc1_config_channel_atten(TURBIDITY_SENSOR_GPIO, ADC_ATTEN_DB_12);
 
-    /* GPIO mực nước XKC-Y26-V (PNP)
-     * PULL_DOWN nội — khi không có nước OUT thả nổi → pull-down giữ LOW
-     * Khi có nước PNP kéo OUT lên VCC → GPIO đọc HIGH                  */
+    /* GPIO mực nước XKC-Y26-V (PNP) */
     gpio_config_t water_conf = {
         .pin_bit_mask = ((uint64_t)1 << WATER_LEVEL_GPIO),
         .mode         = GPIO_MODE_INPUT,
@@ -399,7 +535,8 @@ esp_err_t app_sensor_init(void)
         .intr_type    = GPIO_INTR_DISABLE,
     };
     gpio_config(&water_conf);
-    ESP_LOGI(TAG, "XKC-Y26-V PNP | GPIO%d PULL_DOWN | HIGH=day, LOW=thap", WATER_LEVEL_GPIO);
+    ESP_LOGI(TAG, "XKC-Y26-V PNP | GPIO%d PULL_DOWN | HIGH=day, LOW=thap",
+             WATER_LEVEL_GPIO);
 
     /* Khởi động: tắt cả hai */
     gpio_set_level(DRAIN_GPIO, 0);
@@ -421,9 +558,12 @@ esp_err_t app_sensor_init(void)
 /* ===================KHỞI TẠO DRIVER TỔNG=================== */
 void app_driver_init(void)
 {
-    /* Tắt brownout detector ngay từ đầu — trước khi relay nào hoạt động */
-    disable_brownout_detector();
 
+    disable_brownout_detector();
+    if (ipc_init() != ESP_OK) {
+        ESP_LOGE(TAG, "IPC init that bai — dung lai!");
+        esp_restart();
+    }
     /* I2C + OLED */
     i2c_master_init();
     ssd1306_dev = ssd1306_create(I2C_MASTER_NUM, SSD1306_I2C_ADDRESS);
@@ -441,7 +581,6 @@ void app_driver_init(void)
                       | ((uint64_t)1 << PUMP_GPIO),
     };
     gpio_config(&out_conf);
-
     app_indicator_init();
 
     /* DS18B20 */
@@ -449,7 +588,10 @@ void app_driver_init(void)
         xTaskCreate(ds18b20_task, "ds18b20_task", 4096, NULL, 5, NULL);
         ESP_LOGI(TAG, "DS18B20 task da khoi dong");
     } else {
-        g_temperature = -99.0f;
+        if (xSemaphoreTake(g_sensor_mutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+            g_temperature = -99.0f;
+            xSemaphoreGive(g_sensor_mutex);
+        }
         ESP_LOGE(TAG, "DS18B20 loi, hien thi -99C");
     }
 
@@ -460,7 +602,7 @@ void app_driver_init(void)
 /* ===================API CÔNG KHAI======================== */
 int app_driver_set_state(bool state)
 {
-    g_power_state = true; 
+    g_power_state = true;
 
     if (state) {
         control_gpio(DRAIN_GPIO, false);
@@ -470,11 +612,9 @@ int app_driver_set_state(bool state)
         esp_rmaker_param_update_and_report(
             esp_rmaker_device_get_param_by_name(pump_device, ESP_RMAKER_DEF_POWER_NAME),
             esp_rmaker_bool(true));
-
         esp_rmaker_param_update_and_report(
             esp_rmaker_device_get_param_by_name(drain_device, ESP_RMAKER_DEF_POWER_NAME),
             esp_rmaker_bool(false));
-
     } else {
         control_gpio(PUMP_GPIO, false);
 
