@@ -1,4 +1,0 @@
-dependencies:
-  espressif/qrcode:
-    version: "*"
-    override_path: "../.."

@@ -169,33 +169,41 @@ static void ds18b20_task(void *arg)
 
 /* ==========CẢM BIẾN pH===============*/
 static float read_ph_sensor(void)
-{
-    int buffer_arr[10];
-    int temp;
-    for (int i = 0; i < 10; i++) {
+{   
+    #define SAMPLES 40
+    int buffer_arr[SAMPLES];
+
+    for (int i = 0; i < SAMPLES; i++) {
         buffer_arr[i] = adc1_get_raw(PH_SENSOR_GPIO);
-        vTaskDelay(pdMS_TO_TICKS(30));
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
-    for (int i = 0; i < 9; i++) {
-        for (int j = i + 1; j < 10; j++) {
+
+    // sort
+    for (int i = 0; i < SAMPLES - 1; i++) {
+        for (int j = i + 1; j < SAMPLES; j++) {
             if (buffer_arr[i] > buffer_arr[j]) {
-                temp = buffer_arr[i];
+                int temp = buffer_arr[i];
                 buffer_arr[i] = buffer_arr[j];
                 buffer_arr[j] = temp;
             }
         }
     }
-    unsigned long avgval = 0;
-    for (int i = 2; i < 8; i++) {
-        avgval += buffer_arr[i];
-    }
-    float voltage = (float)avgval * 3.3f / 4095.0f / 6.0f;
-    float calibration_value = 22.84f;
-    float ph_act = -5.70f * voltage + calibration_value;
 
-    ESP_LOGI(TAG, "pH ADC Raw: %lu | Voltage: %.2fV | pH Value: %.2f",
-             avgval / 6, voltage, ph_act);
-    return ph_act;
+    unsigned long sum = 0;
+    int count = 0;
+    for (int i = 10; i < SAMPLES - 10; i++) {
+        sum += buffer_arr[i];
+        count++;
+    }
+
+    float avg_adc = (float)sum / count;
+    float voltage = avg_adc * 3.3f / 4095.0f;
+
+    printf("ADC: %.0f | Voltage: %.3f V\n", avg_adc, voltage);
+
+    float ph = 7.0f + ((2.5f - voltage) / 0.18f);
+
+    return ph;
 }
 
 /* ========== CẢM BIẾN ĐỘ ĐỤC============ */

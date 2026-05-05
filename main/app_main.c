@@ -11,6 +11,7 @@
 #include <app_network.h>
 #include <app_insights.h>
 #include "app_priv.h"
+#include "driver/adc.h"
 extern int app_driver_set_servo(bool state);
 
 static const char *TAG = "app_main";
@@ -187,12 +188,13 @@ void app_main(void)
     esp_rmaker_start();
     app_network_start(POP_TYPE_RANDOM);
     /* Water Level Sensor Switch */
-level_sensor_switch = esp_rmaker_switch_device_create(
+    level_sensor_switch = esp_rmaker_switch_device_create(
     "Water Level Sensor", NULL, true);
 
-esp_rmaker_device_add_cb(level_sensor_switch, level_sensor_write_cb, NULL);
-esp_rmaker_node_add_device(node, level_sensor_switch);
-
+    esp_rmaker_device_add_cb(level_sensor_switch, level_sensor_write_cb, NULL);
+    esp_rmaker_node_add_device(node, level_sensor_switch);
+    adc1_config_width(ADC_WIDTH_BIT_12);
+    adc1_config_channel_atten(PH_SENSOR_GPIO, ADC_ATTEN_DB_11);
     /* LOOP */
     while (1) {
 
